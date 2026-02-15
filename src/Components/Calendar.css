@@ -1,0 +1,234 @@
+/* PAGE CONTAINER */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* BLURRED FULL BACKGROUND */
+.container::before {
+  content: "";
+  position: fixed;
+  top: -60px;
+  left: -60px;
+  right: -60px;
+  bottom: -60px;
+  background-image: url("../../public/hanuma.jpeg");
+  background-size: cover;
+  background-position: center;
+  filter: blur(1px) brightness(0.9);
+  transform: scale(1.1);   /* avoid blur edges */
+  z-index: -2;
+}
+
+/* CLEAR CENTER IMAGE */
+.container::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+  linear-gradient(
+      to bottom,
+      rgba(255,140,0,0.3),
+      rgba(255,140,0,0.1) 30%,
+      rgba(255,140,0,0.1) 70%,
+      rgba(255,140,0,0.3)
+    ), url("../../public/hanuma.jpeg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+
+/* CALENDAR CARD BOX */
+.calendar-card {
+  background: transparent;
+  backdrop-filter: blur(6px);
+  width: 380px;
+  max-width: 95%;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  margin-bottom: 25px;
+  transition: transform 0.2s ease;
+}
+
+.calendar-card:hover {
+  transform: translateY(-3px);
+}
+
+/* REACT CALENDAR OVERRIDES */
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  font-family: Arial, sans-serif;
+}
+
+.react-calendar__navigation {
+  margin-bottom: 10px;
+}
+
+.react-calendar__navigation button {
+  background: #eef1f6;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.react-calendar__navigation button:hover {
+  background: #dfe4ea;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  font-weight: bold;
+  color: #555;
+}
+
+.react-calendar__tile {
+  height: 42px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.react-calendar__tile:hover {
+  background: #e8f0ff;
+}
+
+.react-calendar__tile--now {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  font-weight: bold;
+}
+
+/* ACTIVE / COMPLETED DATE COLORS */
+.active-range {
+  background: green !important;
+  color: white !important;
+  border-radius: 10px;
+}
+
+.completed-date {
+  background: red !important;
+  color: white !important;
+  border-radius: 10px;
+}
+
+.disabled-date {
+  background: #ddd !important;
+  color: #aaa !important;
+}
+
+/* NUMBERS + IMAGE SECTION */
+.chant-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+}
+
+/* NUMBERS BOX */
+.numbers-box {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.num {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  background: #eee;
+  border-radius: 8px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+justify-content: center;
+
+  transition: 0.2s ease;
+}
+
+.num.played {
+  background: red;
+  color: white;
+}
+
+/* MANTRA IMAGE */
+.mantra-image {
+  margin-top: 30px;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.mantra-image img {
+  width: 350px;
+  max-width: 90%;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+/* POPUP */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  text-align: center;
+  animation: pop 0.3s ease;
+}
+
+.popup-content img {
+  width: 200px;
+  margin-bottom: 15px;
+}
+
+.popup-content button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  background: red;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ANIMATIONS */
+@keyframes pop {
+  from { transform: scale(0.6); }
+  to { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
