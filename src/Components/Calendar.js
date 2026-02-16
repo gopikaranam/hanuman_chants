@@ -199,15 +199,6 @@ export default function MyCalendar({ session, setSession }) {
   /* ---------------- UI ---------------- */
   return (
     <div className="container">
-      <div className="hanuman-wrapper">
-        <img 
-        src="/marakathahanuma.png" 
-        alt="Hanuman Statue" 
-        className="hanuman-statue"
-      />
-      </div>
-
-      
       <div className="global-controls">
         <div className="lang-dropdown">
           <div className="lang-selected" onClick={() => setLangOpen(!langOpen)}>

@@ -43,13 +43,6 @@ export default function Landing({ setSession }) {
 
   return (
     <div className="container">
-      <div className="hanuman-wrapper">
-        <img 
-        src="/marakathahanuma.png" 
-        alt="Hanuman Statue" 
-        className="hanuman-statue"
-      />
-      </div>
       <div className="landing-card">
 
         <h2>Om Namo Hanumathey Namaha</h2>

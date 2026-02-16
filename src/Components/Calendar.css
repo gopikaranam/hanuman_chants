@@ -26,7 +26,7 @@ html, body {
   left: -60px;
   right: -60px;
   bottom: -60px;
-  background-image: url("../../public/hanuma.jpeg");
+  background-image: url("../../public/hanuma_new.jpeg");
   background-size: cover;
   background-position: center;
   filter: blur(1px) brightness(0.9);
@@ -46,7 +46,7 @@ html, body {
       rgba(255,140,0,0.1) 30%,
       rgba(255,140,0,0.1) 70%,
       rgba(255,140,0,0.3)
-    ), url("../../public/hanuma.jpeg");
+    ), url("../../public/hanuma_new.jpeg");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -278,42 +278,6 @@ justify-content: center;
   background: green !important;
   color: white !important;
   border-radius: 10px;
-}
-
-
-.hanuman-statue {
-  width: 350px;      /* INCREASE SIZE */
-  height: 200px;
-  opacity: 0.97;
-
-  filter: drop-shadow(0 8px 22px rgba(0,0,0,0.45))
-          contrast(1.08)
-          saturate(1.15);
-
-  /* Strong edge fade */
-  mask-image: radial-gradient(circle at center,
-              black 60%,
-              rgba(0,0,0,0.6) 75%,
-              transparent 95%);
-  -webkit-mask-image: radial-gradient(circle at center,
-              black 60%,
-              rgba(0,0,0,0.6) 75%,
-              transparent 95%);
-
-  mix-blend-mode: multiply;   /* blends orange box */
-}
-
-.hanuman-wrapper {
-  position: fixed;
-  top: 80px;          /* slightly higher */
-  left: -100px;
-  z-index: 5;
-  pointer-events: none;
-
-  padding: 0;         /* IMPORTANT */
-  border-radius: 0;    /* remove round box */
-
-  background: transparent;  /* no background */
 }
 
 /* DROPDOWN & VOULUME CONTROLS */
