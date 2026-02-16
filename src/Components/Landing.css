@@ -1,0 +1,103 @@
+/* LANDING PAGE CONTAINER */
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* GLASS CARD */
+.landing-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 35px 45px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+  width: 380px;
+  max-width: 95%;
+  animation: fadeIn 0.4s ease;
+}
+
+/* TITLE */
+.landing-card h2 {
+  margin-bottom: 20px;
+  color: #222;
+  font-weight: bold;
+}
+
+/* INPUT BOX */
+.landing-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+  transition: 0.2s ease;
+}
+
+.landing-input:focus {
+  box-shadow: 0 0 0 2px #ff9800;
+}
+
+/* BUTTON BASE */
+.landing-btn {
+  margin-top: 15px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* PRIMARY BUTTON (Generate / Continue) */
+.landing-btn-primary {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: white;
+}
+
+.landing-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* SECONDARY BUTTON (Submit) */
+.landing-btn-secondary {
+  background: #ffffff;
+  color: #333;
+}
+
+.landing-btn-secondary:hover {
+  background: #f0f0f0;
+}
+
+/* SESSION ID TEXT */
+.session-id {
+  margin-top: 10px;
+  color: #c62828;
+  font-weight: bold;
+  word-break: break-all;
+}
+
+/* HR LINE */
+.landing-divider {
+  margin: 20px 0;
+  border: none;
+  height: 1px;
+  background: rgba(0,0,0,0.2);
+}
+
+/* FADE ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+

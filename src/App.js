@@ -1,8 +1,11 @@
-import Calendar from "./Components/Calendar";
+import React, { useState } from "react";
+import Landing from "./Landing";
+import MyCalendar from "./Components/Calendar";
 
+export default function App() {
+  const [session, setSession] = useState(null);
 
-function App() {
-  return <Calendar />;
+  return session
+    ? <MyCalendar session={session} setSession={setSession} />
+    : <Landing setSession={setSession} />;
 }
-
-export default App;
