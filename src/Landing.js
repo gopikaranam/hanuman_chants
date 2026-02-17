@@ -21,24 +21,22 @@ export default function Landing({ setSession }) {
 
     const session = await res.json();
     setGeneratedSession({
-  id: session.rowKey,
-  expiry: session.expiry
-});
+      id: session.rowKey,
+      expiry: session.expiry
+    });
 
   } catch {
     setServerDown(true);
   }
 };
 
-
-
   // ---------- CONTINUE AFTER GENERATE ----------
   const handleContinue = () => {
   setSession({
     id: generatedSession.rowKey,
     expiry: generatedSession.expiry
-  });
-};
+    });
+  };
 
   // ---------- ENTER ID ----------
   const handleSubmitId = async () => {
@@ -51,16 +49,14 @@ export default function Landing({ setSession }) {
 
     const session = await res.json();
     setSession({
-  id: session.rowKey,
-  expiry: session.expiry
-});
+      id: session.rowKey,
+      expiry: session.expiry
+    });
 
   } catch {
     setServerDown(true);
   }
 };
-
-
 
   return (
     <div className="container">
@@ -85,9 +81,9 @@ export default function Landing({ setSession }) {
         {/* GENERATE SECTION */}
         {!generatedSession && (
           <>
-          <h4>No ID?</h4>
+          <h4>Start your Chants Today</h4>
             <button className="landing-btn landing-btn-primary" onClick={handleGenerate}>
-              Generate Here
+              Start
             </button>
 
             <hr style={{margin:"20px 0"}} />
@@ -117,13 +113,16 @@ export default function Landing({ setSession }) {
         {generatedSession && (
           <>
             <h4>Your Session ID:</h4>
-            <h2 className="session-id" style={{color:"red"}}>
-              {generatedSession.rowKey}
-            </h2>
+            <h4 className="session-id" style={{color:"red"}}>
+              {generatedSession.id}
+            </h4>
 
             <button className="landing-btn landing-btn-secondary" onClick={handleContinue}>
               Continue
             </button>
+            <h5 className="session-id" style={{color:"black"}}>
+              (Note: Please save this ID to access your chants in the future)
+            </h5>
           </>
         )}
       </div>
