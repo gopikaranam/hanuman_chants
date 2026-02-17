@@ -13,6 +13,10 @@ import Mantram_KN from "../Assets/Mantram_KN.jpeg";
 import Mantram_ML from "../Assets/Mantram_ML.jpeg";
 import Mantram_GJ from "../Assets/Mantram_GJ.jpeg";
 
+const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
+//const API_BASE = "https://localhost:7137/api/session";
+
+
 const numbers = [1,2,3,4,5,6,7,8,9];
 
 const mantraImages = {
@@ -25,6 +29,8 @@ const mantraImages = {
   Gujarati: Mantram_GJ
 };
 
+
+
 export default function MyCalendar({ session, setSession }) {
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -33,7 +39,6 @@ export default function MyCalendar({ session, setSession }) {
   const [completedDates, setCompletedDates] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [processingDate, setProcessingDate] = useState(null);
-
   const [language, setLanguage] = useState("");
   const effectiveLanguage = language || "English";
   const [volume, setVolume] = useState(1);
@@ -42,10 +47,65 @@ export default function MyCalendar({ session, setSession }) {
   const [rangeMode, setRangeMode] = useState(false);
   const [rangeStart, setRangeStart] = useState(null);
   const [rangeEnd, setRangeEnd] = useState(null);
+  const [serverDown, setServerDown] = useState(false);
 
   const audioRef = useRef(new Audio(Mantra));
   const today = useRef(new Date()).current;
   
+  /* ---------- SERVER LOAD ---------- */
+    const loadSessionFromServer = async () => {
+      if (!session?.id) return;
+  
+      try {
+        const res = await fetch(`${API_BASE}/${session.id}`);
+        if (!res.ok) throw new Error("Server Unreachable");
+  
+        const data = await res.json();
+        setServerDown(false);
+  
+        if (data.completedDates && data.completedDates.trim() !== "") {
+        setCompletedDates(data.completedDates.split(","));
+        } else {
+          setCompletedDates([]);
+        }
+  
+        if (data.rangeStart && data.rangeEnd) {
+        setRangeStart(new Date(data.rangeStart));
+        setRangeEnd(new Date(data.rangeEnd));
+        setRangeMode(true);
+      }
+      } catch (err) {
+        console.error("Server error:", err);
+        setServerDown(true);
+      }
+    };
+  
+    useEffect(() => {
+      loadSessionFromServer();
+    }, [session]);
+  
+    /* ---------- SERVER SAVE ---------- */
+    const saveSessionToServer = async (updatedDates) => {
+      if (!session?.id) return;
+  
+      try {
+      const res = await fetch(`${API_BASE}/${session.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          completedDates: updatedDates.join(","),
+          rangeStart,
+          rangeEnd
+        })
+    });
+
+    if (!res.ok) throw new Error("Save failed");
+
+    setServerDown(false);
+  } catch (err) {
+    setServerDown(true);
+  }
+    };
 
   /* ---------------- AUDIO VOLUME ---------------- */
   const toggleMute = () => {
@@ -171,18 +231,16 @@ export default function MyCalendar({ session, setSession }) {
 
     setIsPlaying(false);
 
-    const dateStr = dateKey(date);
+    const key = dateKey(date);
     let updated = completedDates;
 
-    if (!completedDates.includes(dateStr)) {
-      updated = [...completedDates, dateStr];
-    }
+    if (!completedDates.includes(key))
+      updated = [...completedDates, key];
 
     setCompletedDates(updated);
     
 
     setShowPopup(true);
-    setProcessingDate(null);
   };
 
   /* ---------------- AUDIO ---------------- */
@@ -198,7 +256,13 @@ export default function MyCalendar({ session, setSession }) {
 
   /* ---------------- UI ---------------- */
   return (
+    
     <div className="container">
+      {serverDown && (
+        <div className="server-banner">
+          Server Unavailable. Please try again later.
+        </div>
+      )}
       <div className="global-controls">
         <div className="lang-dropdown">
           <div className="lang-selected" onClick={() => setLangOpen(!langOpen)}>
@@ -338,7 +402,9 @@ export default function MyCalendar({ session, setSession }) {
           <div className="popup-content">
             <img src={ram} alt="Completed"/>
             <h3>Completed</h3>
-            <button onClick={()=>{
+            <button onClick={async ()=>{
+              await saveSessionToServer(completedDates);
+
               setShowPopup(false);
               setPlayedNumbers([]);
               setSelectedDate(null);

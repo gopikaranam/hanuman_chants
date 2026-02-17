@@ -1,48 +1,83 @@
 import React, { useState } from "react";
-import { generateSessionId, addDays } from "./utils";
 import "./Components/Landing.css";
+
+const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
+//const API_BASE = "https://localhost:7137/api/session";
 
 export default function Landing({ setSession }) {
 
   const [generatedSession, setGeneratedSession] = useState(null);
   const [enteredId, setEnteredId] = useState("");
+  const [serverDown, setServerDown] = useState(false);
 
   // ---------- GENERATE ID ----------
-  const handleGenerate = () => {
-    const id = generateSessionId();
-    const expiry = addDays(new Date(), 16);
+  const handleGenerate = async () => {
+  try {
+    const res = await fetch(`${API_BASE}`, {
+      method: "POST"
+    });
 
-    const sessionObj = {
-      id,
-      expiry,
-      rangeStart: null,
-      rangeEnd: null,
-      completedDates: []
-    };
+    if (!res.ok) throw new Error();
 
-    localStorage.setItem("hanumanSession", JSON.stringify(sessionObj));
+    const session = await res.json();
+    setGeneratedSession({
+  id: session.rowKey,
+  expiry: session.expiry
+});
 
-    setGeneratedSession(sessionObj);
-  };
+  } catch {
+    setServerDown(true);
+  }
+};
+
+
 
   // ---------- CONTINUE AFTER GENERATE ----------
   const handleContinue = () => {
-    setSession(generatedSession);
-  };
+  setSession({
+    id: generatedSession.rowKey,
+    expiry: generatedSession.expiry
+  });
+};
 
   // ---------- ENTER ID ----------
-  const handleSubmitId = () => {
-    const saved = JSON.parse(localStorage.getItem("hanumanSession"));
+  const handleSubmitId = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/${enteredId}`
+    );
 
-    if (saved && saved.id === enteredId.trim()) {
-      setSession(saved);
-    } else {
-      alert("Invalid ID");
-    }
-  };
+    if (!res.ok) throw new Error();
+
+    const session = await res.json();
+    setSession({
+  id: session.rowKey,
+  expiry: session.expiry
+});
+
+  } catch {
+    setServerDown(true);
+  }
+};
+
+
 
   return (
     <div className="container">
+      {serverDown ? (
+      <div className="server-popup">
+        <div className="server-popup-content">
+          <h2>Server Unavailable</h2>
+          <p>Please try again later.</p>
+
+          <button className="landing-btn landing-btn-primary" 
+          onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    ) : (
       <div className="landing-card">
 
         <h2>Om Namo Hanumathey Namaha</h2>
@@ -83,7 +118,7 @@ export default function Landing({ setSession }) {
           <>
             <h4>Your Session ID:</h4>
             <h2 className="session-id" style={{color:"red"}}>
-              {generatedSession.id}
+              {generatedSession.rowKey}
             </h2>
 
             <button className="landing-btn landing-btn-secondary" onClick={handleContinue}>
@@ -92,6 +127,7 @@ export default function Landing({ setSession }) {
           </>
         )}
       </div>
+    )}
     </div>
   );
 }
