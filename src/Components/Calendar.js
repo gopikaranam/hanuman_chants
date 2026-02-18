@@ -18,7 +18,7 @@ const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
 //const API_BASE = "https://localhost:7137/api/session";
 
 
-const numbers = [1];
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const mantraImages = {
   English: Mantram_EN,
@@ -241,7 +241,7 @@ export default function MyCalendar({ session, setSession }) {
   const playNineTimes = async (date) => {
     setIsPlaying(true);
 
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= 9; i++) {
       await playAudio();
       setPlayedNumbers(prev => [...prev, i]);
     }

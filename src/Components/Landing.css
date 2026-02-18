@@ -101,3 +101,27 @@
 
 
 
+/* copy id  */
+.session-copy-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.session-id {
+  color: red;
+  font-weight: bold;
+}
+
+.copy-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+  transition: transform 0.2s;
+  
+}
+
+.copy-icon:hover {
+  transform: scale(1.2);
+}
