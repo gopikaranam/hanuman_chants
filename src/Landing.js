@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./Components/Landing.css";
 
-const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
-//const API_BASE = "https://localhost:7137/api/session";
+//const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
+const API_BASE = "https://localhost:7137/api/session";
 
 export default function Landing({ setSession }) {
 

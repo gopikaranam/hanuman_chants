@@ -4,6 +4,7 @@ import "./Calendar.css";
 import Mantra from "../Assets/Mantra.mp3";
 import ram from "../Assets/ram.png";
 import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
+import hanuman_fly from "../Assets/hanuman_fly.jpeg";
 
 import Mantram_TE from "../Assets/Mantram_TE.jpeg";
 import Mantram_EN from "../Assets/Mantram_EN.jpeg";
@@ -13,11 +14,11 @@ import Mantram_KN from "../Assets/Mantram_KN.jpeg";
 import Mantram_ML from "../Assets/Mantram_ML.jpeg";
 import Mantram_GJ from "../Assets/Mantram_GJ.jpeg";
 
-const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
-//const API_BASE = "https://localhost:7137/api/session";
+//const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
+const API_BASE = "https://localhost:7137/api/session";
 
 
-const numbers = [1,2,3,4,5,6,7,8,9];
+const numbers = [1];
 
 const mantraImages = {
   English: Mantram_EN,
@@ -48,6 +49,7 @@ export default function MyCalendar({ session, setSession }) {
   const [rangeStart, setRangeStart] = useState(null);
   const [rangeEnd, setRangeEnd] = useState(null);
   const [serverDown, setServerDown] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const audioRef = useRef(new Audio(Mantra));
   const today = useRef(new Date()).current;
@@ -224,7 +226,7 @@ export default function MyCalendar({ session, setSession }) {
   const playNineTimes = async (date) => {
     setIsPlaying(true);
 
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 1; i <= 1; i++) {
       await playAudio();
       setPlayedNumbers(prev => [...prev, i]);
     }
@@ -258,6 +260,25 @@ export default function MyCalendar({ session, setSession }) {
   return (
     
     <div className="container">
+      {redirecting && (
+  <div className="redirect-overlay">
+    <img src={hanuman_fly} className="hanuman-fly" alt="Hanuman Flying" />
+    <div className="redirect-text">
+          <div className="main-sloka">
+        🕉️శ్రీరామ రామ రామేతి ,
+        రమే రామే మనోరమే;
+        సహస్ర నామ తతుల్యం,
+        రామ నామ వరాననే......జై శ్రీరామ్🕉️
+      </div>
+
+      <div className="jai-hanuman">
+        జై హనుమాన్ 🙏
+      </div>
+    </div>
+    
+    
+  </div>
+)}
       {serverDown && (
         <div className="server-banner">
           Server Unavailable. Please try again later.
@@ -408,6 +429,11 @@ export default function MyCalendar({ session, setSession }) {
               setShowPopup(false);
               setPlayedNumbers([]);
               setSelectedDate(null);
+
+              setRedirecting(true);
+              setTimeout(() => {
+                setSession(null);
+              }, 10000);
             }}>
               Close
             </button>
