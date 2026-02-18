@@ -15,7 +15,7 @@ export default function Landing({ setSession }) {
   // ---------- Server Notification ----------
   const notifySupport = async () => {
   try {
-    await fetch("http://notifysupport.azurewebsites.net/api/NotifySupport", {
+    await fetch("https://notifysupport.azurewebsites.net/api/NotifySupport", {
       method: "POST"
     });
   } catch (e) {
