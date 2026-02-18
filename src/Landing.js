@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./Components/Landing.css";
 
-//const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
-const API_BASE = "https://localhost:7137/api/session";
+const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
+//const API_BASE = "https://localhost:7137/api/session";
 
 export default function Landing({ setSession }) {
 
@@ -12,38 +12,40 @@ export default function Landing({ setSession }) {
 
   // ---------- GENERATE ID ----------
   const handleGenerate = async () => {
-  try {
-    const res = await fetch(`${API_BASE}`, {
-      method: "POST"
-    });
+    try {
+      const res = await fetch(`${API_BASE}`, {
+        method: "POST"
+      });
 
-    if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error();
 
-    const session = await res.json();
-    setGeneratedSession({
-      id: session.rowKey,
-      expiry: session.expiry
-    });
+      const session = await res.json();
+      setGeneratedSession({
+        id: session.rowKey,
+        expiry: session.expiry
+      });
 
-  } catch {
-    setServerDown(true);
-  }
-};
+    } catch {
+      setServerDown(true);
+    }
+  };
 
   // ---------- CONTINUE AFTER GENERATE ----------
   const handleContinue = () => {
-  setSession({
-    id: generatedSession.rowKey,
-    expiry: generatedSession.expiry
+    if (!generatedSession) return;
+
+    localStorage.setItem("hanuman_session_id", generatedSession.id);
+
+    setSession({
+      id: generatedSession.id,
+      expiry: generatedSession.expiry
     });
   };
 
   // ---------- ENTER ID ----------
   const handleSubmitId = async () => {
   try {
-    const res = await fetch(
-      `${API_BASE}/${enteredId}`
-    );
+    const res = await fetch(`${API_BASE}/${enteredId}`);
 
     if (!res.ok) throw new Error();
 
@@ -52,6 +54,7 @@ export default function Landing({ setSession }) {
       id: session.rowKey,
       expiry: session.expiry
     });
+    localStorage.setItem("hanuman_session_id", session.rowKey);
 
   } catch {
     setServerDown(true);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef,useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Calendar from "react-calendar";
 import "./Calendar.css";
 import Mantra from "../Assets/Mantra.mp3";
@@ -14,8 +14,8 @@ import Mantram_KN from "../Assets/Mantram_KN.jpeg";
 import Mantram_ML from "../Assets/Mantram_ML.jpeg";
 import Mantram_GJ from "../Assets/Mantram_GJ.jpeg";
 
-//const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
-const API_BASE = "https://localhost:7137/api/session";
+const API_BASE = "https://hanumanchantsapi.azurewebsites.net/api/session";
+//const API_BASE = "https://localhost:7137/api/session";
 
 
 const numbers = [1];
@@ -53,45 +53,56 @@ export default function MyCalendar({ session, setSession }) {
 
   const audioRef = useRef(new Audio(Mantra));
   const today = useRef(new Date()).current;
-  
+
   /* ---------- SERVER LOAD ---------- */
-    const loadSessionFromServer = async () => {
-      if (!session?.id) return;
-  
-      try {
-        const res = await fetch(`${API_BASE}/${session.id}`);
-        if (!res.ok) throw new Error("Server Unreachable");
-  
-        const data = await res.json();
-        setServerDown(false);
-  
-        if (data.completedDates && data.completedDates.trim() !== "") {
+  const loadSessionFromServer = async () => {
+    if (!session?.id) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/${session.id}`);
+      if (!res.ok) throw new Error("Server Unreachable");
+
+      const data = await res.json();
+      setServerDown(false);
+
+      if (data.completedDates && data.completedDates.trim() !== "") {
         setCompletedDates(data.completedDates.split(","));
-        } else {
-          setCompletedDates([]);
-        }
-  
-        if (data.rangeStart && data.rangeEnd) {
+      } else {
+        setCompletedDates([]);
+      }
+
+      if (data.rangeStart && data.rangeEnd) {
         setRangeStart(new Date(data.rangeStart));
         setRangeEnd(new Date(data.rangeEnd));
         setRangeMode(true);
       }
-      } catch (err) {
-        console.error("Server error:", err);
-        setServerDown(true);
-      }
-    };
-  
-    useEffect(() => {
-      loadSessionFromServer();
-    }, [session]);
-  
-    /* ---------- SERVER SAVE ---------- */
-    const saveSessionToServer = async (updatedDates) => {
-      if (!session?.id) return;
-  
-      try {
-      const res = await fetch(`${API_BASE}/${session.id}`, {
+    } catch (err) {
+      console.error("Server error:", err);
+      setServerDown(true);
+    }
+  };
+
+  useEffect(() => {
+    loadSessionFromServer();
+  }, [session]);
+
+  /* ---------- SERVER SAVE ---------- */
+  const saveSessionToServer = async (updatedDates) => {
+
+    const idFromState = session?.id;
+    const idFromStorage = localStorage.getItem("hanuman_session_id");
+
+    const finalId = idFromState || idFromStorage;
+
+    // console.log("SAVE SESSION ID:", finalId);
+
+    if (!finalId) {
+      console.log("NO SESSION ID – NOT SAVING");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/${finalId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,15 +110,19 @@ export default function MyCalendar({ session, setSession }) {
           rangeStart,
           rangeEnd
         })
-    });
+      });
 
-    if (!res.ok) throw new Error("Save failed");
+      // console.log("PUT RESPONSE:", res.status);
 
-    setServerDown(false);
-  } catch (err) {
-    setServerDown(true);
-  }
-    };
+      if (!res.ok) throw new Error("Save failed");
+
+      setServerDown(false);
+    } catch (err) {
+      console.error("PUT ERROR:", err);
+      setServerDown(true);
+    }
+  };
+
 
   /* ---------------- AUDIO VOLUME ---------------- */
   const toggleMute = () => {
@@ -123,14 +138,14 @@ export default function MyCalendar({ session, setSession }) {
   };
 
   useEffect(() => {
-  if (volume === 0) {
-    setIsMuted(true);
-    audioRef.current.volume = 0;
-  } else {
-    setIsMuted(false);
-    audioRef.current.volume = volume;
-  }
-}, [volume]);
+    if (volume === 0) {
+      setIsMuted(true);
+      audioRef.current.volume = 0;
+    } else {
+      setIsMuted(false);
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   /* ---------------- DATE HELPERS ---------------- */
   const normalizeDate = (d) =>
@@ -138,7 +153,7 @@ export default function MyCalendar({ session, setSession }) {
 
   const dateKey = useCallback((d) => {
     const n = normalizeDate(d);
-    return `${n.getFullYear()}-${n.getMonth()+1}-${n.getDate()}`;
+    return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
   }, []);
 
   const isTodayCompleted = completedDates.includes(dateKey(today));
@@ -167,26 +182,26 @@ export default function MyCalendar({ session, setSession }) {
 
   /* ---- AUTO MARK PAST RANGE DATES RED ---- */
   useEffect(() => {
-  if (!rangeStart || !rangeEnd) return;
+    if (!rangeStart || !rangeEnd) return;
 
-  let changed = false;
-  const updated = [...completedDates];
-  let d = new Date(rangeStart);
+    let changed = false;
+    const updated = [...completedDates];
+    let d = new Date(rangeStart);
 
-  while (normalizeDate(d) < normalizeDate(today)) {
-    const key = dateKey(d);
-    if (!updated.includes(key)) {
-      updated.push(key);
-      changed = true;   // mark change
+    while (normalizeDate(d) < normalizeDate(today)) {
+      const key = dateKey(d);
+      if (!updated.includes(key)) {
+        updated.push(key);
+        changed = true;   // mark change
+      }
+      d.setDate(d.getDate() + 1);
     }
-    d.setDate(d.getDate() + 1);
-  }
 
-  if (changed) {
-    setCompletedDates(updated);
-  }
+    if (changed) {
+      setCompletedDates(updated);
+    }
 
-}, [rangeStart, rangeEnd, completedDates, dateKey, today]);
+  }, [rangeStart, rangeEnd, completedDates, dateKey, today]);
 
 
 
@@ -204,7 +219,7 @@ export default function MyCalendar({ session, setSession }) {
 
       setRangeStart(start);
       setRangeEnd(end);
-      
+
       return;
     }
 
@@ -240,7 +255,7 @@ export default function MyCalendar({ session, setSession }) {
       updated = [...completedDates, key];
 
     setCompletedDates(updated);
-    
+
 
     setShowPopup(true);
   };
@@ -258,27 +273,27 @@ export default function MyCalendar({ session, setSession }) {
 
   /* ---------------- UI ---------------- */
   return (
-    
+
     <div className="container">
       {redirecting && (
-  <div className="redirect-overlay">
-    <img src={hanuman_fly} className="hanuman-fly" alt="Hanuman Flying" />
-    <div className="redirect-text">
-          <div className="main-sloka">
-        🕉️శ్రీరామ రామ రామేతి ,
-        రమే రామే మనోరమే;
-        సహస్ర నామ తతుల్యం,
-        రామ నామ వరాననే......జై శ్రీరామ్🕉️
-      </div>
+        <div className="redirect-overlay">
+          <img src={hanuman_fly} className="hanuman-fly" alt="Hanuman Flying" />
+          <div className="redirect-text">
+            <div className="main-sloka">
+              🕉️శ్రీరామ రామ రామేతి ,
+              రమే రామే మనోరమే;
+              సహస్ర నామ తతుల్యం,
+              రామ నామ వరాననే......జై శ్రీరామ్🕉️
+            </div>
 
-      <div className="jai-hanuman">
-        జై హనుమాన్ 🙏
-      </div>
-    </div>
-    
-    
-  </div>
-)}
+            <div className="jai-hanuman">
+              జై హనుమాన్ 🙏
+            </div>
+          </div>
+
+
+        </div>
+      )}
       {serverDown && (
         <div className="server-banner">
           Server Unavailable. Please try again later.
@@ -287,12 +302,12 @@ export default function MyCalendar({ session, setSession }) {
       <div className="global-controls">
         <div className="lang-dropdown">
           <div className="lang-selected" onClick={() => setLangOpen(!langOpen)}>
-          {language || "Select Language"}
+            {language || "Select Language"}
           </div>
 
           {langOpen && (
             <div className="lang-options">
-              {["English","Telugu","Hindi","Tamil","Kannada","Malayalam","Gujarati"]
+              {["English", "Telugu", "Hindi", "Tamil", "Kannada", "Malayalam", "Gujarati"]
                 .map(lang => (
                   <div key={lang}
                     className="lang-option"
@@ -303,16 +318,16 @@ export default function MyCalendar({ session, setSession }) {
                   >
                     {lang}
                   </div>
-              ))}
+                ))}
             </div>
           )}
-      </div>
+        </div>
 
-      <div className="volume-controls">
+        <div className="volume-controls">
           {isMuted || volume === 0 ? (
-          <FaVolumeMute className="speaker-icon" onClick={toggleMute}/>
-          ) :  (
-            <FaVolumeUp className="speaker-icon" onClick={toggleMute}/>
+            <FaVolumeMute className="speaker-icon" onClick={toggleMute} />
+          ) : (
+            <FaVolumeUp className="speaker-icon" onClick={toggleMute} />
           )}
           <input
             type="range"
@@ -321,15 +336,15 @@ export default function MyCalendar({ session, setSession }) {
             step="0.01"
             value={volume}
             onChange={(e) => {
-            const val = parseFloat(e.target.value);
-            setVolume(val);
-          }}
+              const val = parseFloat(e.target.value);
+              setVolume(val);
+            }}
             className="volume-slider"
           />
+        </div>
       </div>
-    </div>
 
-    <div className="calendar-card">
+      <div className="calendar-card">
         <Calendar
           value={selectedDate}
           onClickDay={handleDateClick}
@@ -375,25 +390,25 @@ export default function MyCalendar({ session, setSession }) {
 
         {/* Date Range Links */}
         <div className="range-links">
-          {!isPlaying && !showPopup && !isTodayCompleted &&(
-          <span onClick={() => {
-            setRangeMode(true);
-            setRangeStart(null);
-            setRangeEnd(null);
-          }}>
-            Time Period
-          </span>
+          {!isPlaying && !showPopup && !isTodayCompleted && (
+            <span onClick={() => {
+              setRangeMode(true);
+              setRangeStart(null);
+              setRangeEnd(null);
+            }}>
+              Time Period
+            </span>
           )}
 
-          {!isPlaying && !showPopup && !isTodayCompleted &&(
-          <span onClick={() => {
-            setRangeMode(false);
-            setRangeStart(null);
-            setRangeEnd(null);
-          }}>
-            Clear
-          </span>
-        )}
+          {!isPlaying && !showPopup && !isTodayCompleted && (
+            <span onClick={() => {
+              setRangeMode(false);
+              setRangeStart(null);
+              setRangeEnd(null);
+            }}>
+              Clear
+            </span>
+          )}
         </div>
       </div>
 
@@ -411,7 +426,7 @@ export default function MyCalendar({ session, setSession }) {
 
           {isPlaying && (
             <div className="mantra-image">
-              <img src={mantraImages[effectiveLanguage]} alt="Mantra"/>
+              <img src={mantraImages[effectiveLanguage]} alt="Mantra" />
             </div>
           )}
         </div>
@@ -421,9 +436,9 @@ export default function MyCalendar({ session, setSession }) {
       {showPopup && (
         <div className="popup">
           <div className="popup-content">
-            <img src={ram} alt="Completed"/>
+            <img src={ram} alt="Completed" />
             <h3>Completed</h3>
-            <button onClick={async ()=>{
+            <button onClick={async () => {
               await saveSessionToServer(completedDates);
 
               setShowPopup(false);
@@ -432,6 +447,7 @@ export default function MyCalendar({ session, setSession }) {
 
               setRedirecting(true);
               setTimeout(() => {
+                localStorage.removeItem("hanuman_session_id");
                 setSession(null);
               }, 10000);
             }}>
