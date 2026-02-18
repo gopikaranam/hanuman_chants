@@ -12,7 +12,16 @@ export default function Landing({ setSession }) {
   const [serverDown, setServerDown] = useState(false);
   const [copied, setCopied] = useState(false);
 
-
+  // ---------- Server Notification ----------
+  const notifySupport = async () => {
+  try {
+    await fetch("http://notifysupport.azurewebsites.net/api/NotifySupport", {
+      method: "POST"
+    });
+  } catch (e) {
+    console.log("Notify failed");
+  }
+};
 
   // ---------- GENERATE ID ----------
   const handleGenerate = async () => {
@@ -31,6 +40,7 @@ export default function Landing({ setSession }) {
 
     } catch {
       setServerDown(true);
+      notifySupport();
     }
   };
 
@@ -62,6 +72,7 @@ export default function Landing({ setSession }) {
 
     } catch {
       setServerDown(true);
+      notifySupport();
     }
   };
 

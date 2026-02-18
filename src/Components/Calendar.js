@@ -54,6 +54,17 @@ export default function MyCalendar({ session, setSession }) {
   const audioRef = useRef(new Audio(Mantra));
   const today = useRef(new Date()).current;
 
+  // ---------- Server Notification ----------
+  const notifySupport = async () => {
+  try {
+    await fetch("http://notifysupport.azurewebsites.net/api/NotifySupport", {
+      method: "POST"
+    });
+  } catch (e) {
+    console.log("Notify failed");
+  }
+};
+
   /* ---------- SERVER LOAD ---------- */
   const loadSessionFromServer = async () => {
     if (!session?.id) return;
@@ -79,6 +90,7 @@ export default function MyCalendar({ session, setSession }) {
     } catch (err) {
       console.error("Server error:", err);
       setServerDown(true);
+      notifySupport();
     }
   };
 
@@ -120,6 +132,7 @@ export default function MyCalendar({ session, setSession }) {
     } catch (err) {
       console.error("PUT ERROR:", err);
       setServerDown(true);
+      notifySupport();
     }
   };
 
